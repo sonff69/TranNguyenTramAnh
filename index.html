@@ -36,37 +36,39 @@
     <style>
         body {
             font-family: 'Nunito', sans-serif;
-            background-color: #FFFFFF; /* Pure white background */
+            background-color: #FFFFFF; /* Nền trắng sạch sẽ */
             color: #3D3D3D;
             overflow-x: hidden;
         }
 
-        /* Continuous pastel bubble floating animation */
+        /* Hiệu ứng bong bóng bay từ dưới lên */
         @keyframes floatUp {
             0% {
-                transform: translateY(110vh) scale(0.5);
+                transform: translateY(105vh) scale(0.7);
                 opacity: 0;
             }
-            15% {
-                opacity: 0.35;
+            10% {
+                opacity: 0.85; /* Độ hiển thị cực kỳ rõ nét */
             }
-            85% {
-                opacity: 0.35;
+            90% {
+                opacity: 0.85;
             }
             100% {
-                transform: translateY(-15vh) scale(1.3);
+                transform: translateY(-15vh) scale(1.2);
                 opacity: 0;
             }
         }
 
         .bg-bubble {
             position: absolute;
-            bottom: -150px;
+            top: 0; /* Điểm tựa tuyệt đối để translateY hoạt động chính xác */
             border-radius: 50%;
             animation: floatUp linear infinite;
             pointer-events: none;
-            mix-blend-mode: multiply;
-            filter: blur(1px);
+            /* Tạo viền nổi khối 3D cho bong bóng siêu rõ nét */
+            box-shadow: inset -8px -8px 12px rgba(0,0,0,0.06), 
+                        inset 8px 8px 12px rgba(255,255,255,0.9), 
+                        0 8px 16px rgba(0,0,0,0.04);
         }
 
         /* Washi tape tear-out look */
@@ -121,13 +123,13 @@
 </head>
 <body class="py-6 px-4 sm:px-6 relative min-h-screen">
 
-    <!-- CONTINUOUS FLOATING PASTEL BUBBLE CONTAINER -->
-    <div id="bubble-bg-container" class="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
-        <!-- Bubbles are generated here via JavaScript on load -->
+    <!-- CONTINUOUS FLOATING PASTEL BUBBLE CONTAINER (Z-INDEX 1) -->
+    <div id="bubble-bg-container" class="fixed inset-0 w-full h-full pointer-events-none z-10 overflow-hidden">
+        <!-- Bong bóng sẽ tự động sinh ra tại đây -->
     </div>
 
-    <!-- MAIN NOTEBOOK CONTAINER -->
-    <div class="max-w-5xl mx-auto bg-journalPaper rounded-3xl shadow-2xl border-4 border-[#8B7E74] overflow-hidden relative z-10 flex flex-col">
+    <!-- MAIN NOTEBOOK CONTAINER (Z-INDEX 20) -->
+    <div class="max-w-5xl mx-auto bg-journalPaper rounded-3xl shadow-2xl border-4 border-[#8B7E74] overflow-hidden relative z-20 flex flex-col">
         
         <!-- Spiral Spine (Metal Rings) on top -->
         <div class="bg-[#8B7E74]/10 border-b border-[#8B7E74]/20 py-2.5 px-8 flex justify-around items-center relative">
@@ -688,34 +690,40 @@
 
     <!-- Interactive Script Mechanics -->
     <script>
-        // Generate continuous background floating bubbles to match the uploaded reference
+        // Hàm sinh bong bóng 3D bóng kính siêu rõ nét
         function generateBackgroundBubbles() {
             const container = document.getElementById('bubble-bg-container');
-            const bubbleCount = 18; // Elegant density, non-distracting
+            container.innerHTML = ''; // Làm sạch bộ nhớ trước khi dựng lại
+            const bubbleCount = 20; // Số lượng bóng vừa phải để mượt mà
             
-            // Soft aesthetic pastel hues from the uploaded image (lavender/purple and warm yellow)
+            // Các dải màu pastel bão hòa tốt để tăng độ rõ nét khi hiển thị trên nền trắng
             const colors = [
-                'rgba(230, 215, 255, 0.45)', // Soft Lavender
-                'rgba(240, 225, 255, 0.45)', // Pale Violet
-                'rgba(255, 245, 210, 0.45)', // Warm Soft Yellow
-                'rgba(255, 235, 230, 0.45)'  // Pale Orange-Pink
+                'rgba(215, 195, 251, 0.75)', // Tím Lavender nhạt học đường
+                'rgba(255, 240, 180, 0.75)', // Vàng nhạt dễ thương
+                'rgba(255, 195, 200, 0.75)', // Hồng đào pastel
+                'rgba(195, 240, 215, 0.75)'  // Xanh mint trong trẻo
             ];
             
             for (let i = 0; i < bubbleCount; i++) {
                 const bubble = document.createElement('div');
                 bubble.className = 'bg-bubble';
                 
-                // Randomize sizes to match the image structure
-                const size = Math.random() * 95 + 45; // Sizes range from 45px to 140px
+                // Thiết lập kích thước ngẫu nhiên từ 50px đến 130px
+                const size = Math.random() * 80 + 50;
                 bubble.style.width = `${size}px`;
                 bubble.style.height = `${size}px`;
                 
-                bubble.style.left = `${Math.random() * 100}%`;
-                bubble.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                // Vị trí ngang ngẫu nhiên
+                bubble.style.left = `${Math.random() * 95}%`;
                 
-                // Randomize delay and duration for infinite continuous upward float
-                const delay = Math.random() * 16;
-                const duration = Math.random() * 18 + 12; // Speed range between 12s and 30s
+                // Kết hợp hiệu ứng đổ bóng radial tạo điểm phản quang trắng ở góc 30% giống khối thủy tinh bóng loáng
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                bubble.style.background = `radial-gradient(circle at 35% 35%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 65%), ${randomColor}`;
+                
+                // Cài đặt độ trễ và vận tốc chuyển động ngẫu nhiên khác nhau
+                const delay = Math.random() * 12;
+                const duration = Math.random() * 14 + 10; // Khoảng 10 giây đến 24 giây mỗi lượt bay
+                
                 bubble.style.animationDelay = `${delay}s`;
                 bubble.style.animationDuration = `${duration}s`;
                 
@@ -723,8 +731,8 @@
             }
         }
 
-        // Initialize background animation on load
-        window.addEventListener('DOMContentLoaded', generateBackgroundBubbles);
+        // Kích hoạt ngay lập tức khi tải trang để đảm bảo không bị trễ
+        window.addEventListener('load', generateBackgroundBubbles);
 
         // 1. Interactive Tabs Switching
         function toggleTab(tabId) {
