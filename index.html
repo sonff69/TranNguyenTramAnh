@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trần Nguyễn Trâm Anh Portfolio</title>
+    <title>Digital Portfolio | Trần Nguyễn Trâm Anh</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Fredoka, Nunito, Patrick Hand -->
@@ -36,11 +36,40 @@
     <style>
         body {
             font-family: 'Nunito', sans-serif;
-            background-color: #F4EBE1;
-            background-image: radial-gradient(#d1c7bd 1px, transparent 1px);
+            background-color: #F5EFEB;
+            background-image: radial-gradient(#d5cbc0 1px, transparent 1px);
             background-size: 24px 24px;
             color: #3D3D3D;
         }
+        
+        /* Floating pastel bubble style mimicking the provided image */
+        .floating-bubble {
+            position: absolute;
+            bottom: -150px;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(14px); /* Blur to make them diffuse and soft like the image */
+            opacity: 0;
+            animation: riseAndSway 18s linear infinite;
+        }
+
+        @keyframes riseAndSway {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.45; /* Soft opacity to make them gentle and not distracting */
+            }
+            85% {
+                opacity: 0.45;
+            }
+            100% {
+                transform: translateY(-135vh) translateX(var(--sway-x, 40px));
+                opacity: 0;
+            }
+        }
+
         .washi-tape-top {
             clip-path: polygon(0% 0%, 5% 100%, 10% 0%, 15% 100%, 20% 0%, 25% 100%, 30% 0%, 35% 100%, 40% 0%, 45% 100%, 50% 0%, 55% 100%, 60% 0%, 65% 100%, 70% 0%, 75% 100%, 80% 0%, 85% 100%, 90% 0%, 95% 100%, 100% 0%, 100% 100%, 0% 100%);
         }
@@ -83,6 +112,9 @@
     </style>
 </head>
 <body class="py-6 px-4 sm:px-6 relative min-h-screen">
+
+    <!-- CONTINUOUS PASTEL BUBBLES CONTAINER (BACKGROUND EFFECT) -->
+    <div id="bubble-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
 
     <!-- MAIN NOTEBOOK CONTAINER -->
     <div class="max-w-5xl mx-auto bg-journalPaper rounded-3xl shadow-2xl border-4 border-[#8B7E74] overflow-hidden relative z-10 flex flex-col">
@@ -646,7 +678,68 @@
 
     <!-- Interactive Script Mechanics -->
     <script>
-        // 1. Interactive Tabs Switching
+        // 1. Continuous Floating Pastel Bubbles Generator (Based on user-uploaded color palette reference)
+        function generateBackgroundBubbles() {
+            const container = document.getElementById('bubble-container');
+            const colors = [
+                'rgba(224, 204, 250, 0.45)', // Soft diffuse lavender (large circle in the image)
+                'rgba(255, 242, 219, 0.45)', // Gentle pastel yellow (small circle in the image)
+                'rgba(255, 218, 224, 0.35)', // Light pastel pink
+                'rgba(215, 245, 225, 0.35)'  // Light pastel mint
+            ];
+
+            const totalBubbles = 12; // Maintain moderate quantity to prevent lag on older computers
+
+            // Spawn initial scattered bubbles
+            for (let i = 0; i < totalBubbles; i++) {
+                spawnBubble(container, colors, true);
+            }
+
+            // Spawn subsequent bubbles continuously
+            setInterval(() => {
+                if (container.childElementCount < totalBubbles) {
+                    spawnBubble(container, colors, false);
+                }
+            }, 3000);
+        }
+
+        function spawnBubble(container, colors, isInitial = false) {
+            const bubble = document.createElement('div');
+            bubble.className = 'floating-bubble';
+            
+            // Randomize size to match organic layout
+            const size = Math.random() * 100 + 70; // 70px to 170px
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            
+            bubble.style.left = `${Math.random() * 100}%`;
+            bubble.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Randomize duration for asynchronous movement
+            const duration = Math.random() * 15 + 18; // 18s to 33s
+            bubble.style.animationDuration = `${duration}s`;
+            
+            // Randomize sway distance
+            const swayDistance = (Math.random() * 140 - 70); // -70px to +70px
+            bubble.style.setProperty('--sway-x', `${swayDistance}px`);
+
+            if (isInitial) {
+                // Instantly offset to start middle-screen on initial page load
+                bubble.style.animationDelay = `-${Math.random() * duration}s`;
+            }
+
+            container.appendChild(bubble);
+
+            // Housekeeping: clean element after complete exit
+            setTimeout(() => {
+                bubble.remove();
+            }, duration * 1000);
+        }
+
+        // Initialize Background generator on load
+        window.addEventListener('DOMContentLoaded', generateBackgroundBubbles);
+
+        // 2. Interactive Tabs Switching
         function toggleTab(tabId) {
             const tabs = document.querySelectorAll('.page-tab');
             tabs.forEach(tab => {
@@ -678,7 +771,7 @@
             }
         }
 
-        // 2. Project Selector Within Notebook Page
+        // 3. Project Selector Within Notebook Page
         function toggleProject(idx) {
             const panels = document.querySelectorAll('.proj-panel');
             panels.forEach(p => p.classList.add('hidden'));
@@ -704,7 +797,7 @@
             }
         }
 
-        // 3. Folder toggling (Bài tập 1)
+        // 4. Folder toggling (Bài tập 1)
         function toggleFolder(id) {
             const el = document.getElementById(id);
             if (el.classList.contains('hidden')) {
@@ -714,7 +807,7 @@
             }
         }
 
-        // 4. Prompt Engineering Task Toggling (Bài tập 3)
+        // 5. Prompt Engineering Task Toggling (Bài tập 3)
         function togglePromptTask(idx) {
             for (let i = 1; i <= 3; i++) {
                 const btn = document.getElementById(`prompt-task-btn-${i}`);
@@ -729,7 +822,7 @@
             }
         }
 
-        // 5. Interactive Star Rating (Tổng kết)
+        // 6. Interactive Star Rating (Tổng kết)
         function rateStars(count) {
             const stars = document.querySelectorAll('#star-rating-container span');
             const feedback = document.getElementById('rating-feedback');
